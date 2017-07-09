@@ -2,6 +2,8 @@
 
 Aplication web (run war in Apache installed)
 
+Eclipse Mars 2 / Windows 7 / 32bit
+
 Build Path
 	Apache 8
 	Java compiler JDK 1.7
