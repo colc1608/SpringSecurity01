@@ -24,7 +24,8 @@ public class PersistentLogin implements Serializable{
 	private String token;
 	
 	@Temporal(TemporalType.TIMESTAMP)
-	private Date last_used;
+	@Column(name="last_used")
+	private Date lastUsed;
 
 	public String getSeries() {
 		return series;
@@ -50,12 +51,12 @@ public class PersistentLogin implements Serializable{
 		this.token = token;
 	}
 
-	public Date getLast_used() {
-		return last_used;
+	public Date getLastUsed() {
+		return lastUsed;
 	}
 
-	public void setLast_used(Date last_used) {
-		this.last_used = last_used;
+	public void setLastUsed(Date last_used) {
+		this.lastUsed = last_used;
 	}
 	
 	

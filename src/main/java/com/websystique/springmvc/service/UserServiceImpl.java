@@ -26,8 +26,8 @@ public class UserServiceImpl implements UserService{
 	}
 
 	public User findBySSO(String sso) {
-		User user = dao.findBySSO(sso);
-		return user;
+		return dao.findBySSO(sso);
+		//return user;
 	}
 
 	public void saveUser(User user) {
@@ -65,7 +65,7 @@ public class UserServiceImpl implements UserService{
 
 	public boolean isUserSSOUnique(Integer id, String sso) {
 		User user = findBySSO(sso);
-		return ( user == null || ((id != null) && (user.getId() == id)));
+		return  user == null || (id != null && user.getId() == id);
 	}
 	
 }

@@ -35,7 +35,11 @@ import com.websystique.springmvc.service.UserService;
 @RequestMapping("/")
 @SessionAttributes("roles")
 public class AppController {
-
+	
+	private static final String LOGGED_IN_USER = "loggedinuser";
+	private static final String REGISTRATION = "registration";
+	
+	
 	@Autowired
 	UserService userService;
 	
@@ -60,7 +64,7 @@ public class AppController {
 
 		List<User> users = userService.findAllUsers();
 		model.addAttribute("users", users);
-		model.addAttribute("loggedinuser", getPrincipal());
+		model.addAttribute(LOGGED_IN_USER, getPrincipal());
 		return "userslist";
 	}
 
@@ -72,8 +76,8 @@ public class AppController {
 		User user = new User();
 		model.addAttribute("user", user);
 		model.addAttribute("edit", false);
-		model.addAttribute("loggedinuser", getPrincipal());
-		return "registration";
+		model.addAttribute(LOGGED_IN_USER, getPrincipal());
+		return REGISTRATION;
 	}
 
 	/**
@@ -85,7 +89,7 @@ public class AppController {
 			ModelMap model) {
 
 		if (result.hasErrors()) {
-			return "registration";
+			return REGISTRATION;
 		}
 
 		/*
@@ -99,14 +103,13 @@ public class AppController {
 		if(!userService.isUserSSOUnique(user.getId(), user.getSsoId())){
 			FieldError ssoError =new FieldError("user","ssoId",messageSource.getMessage("non.unique.ssoId", new String[]{user.getSsoId()}, Locale.getDefault()));
 		    result.addError(ssoError);
-			return "registration";
+			return REGISTRATION;
 		}
 		
 		userService.saveUser(user);
 
 		model.addAttribute("success", "User " + user.getFirstName() + " "+ user.getLastName() + " registered successfully");
-		model.addAttribute("loggedinuser", getPrincipal());
-		//return "success";
+		model.addAttribute(LOGGED_IN_USER, getPrincipal());
 		return "registrationsuccess";
 	}
 
@@ -119,8 +122,8 @@ public class AppController {
 		User user = userService.findBySSO(ssoId);
 		model.addAttribute("user", user);
 		model.addAttribute("edit", true);
-		model.addAttribute("loggedinuser", getPrincipal());
-		return "registration";
+		model.addAttribute(LOGGED_IN_USER, getPrincipal());
+		return REGISTRATION;
 	}
 	
 	/**
@@ -132,21 +135,16 @@ public class AppController {
 			ModelMap model, @PathVariable String ssoId) {
 
 		if (result.hasErrors()) {
-			return "registration";
+			return REGISTRATION;
 		}
 
-		/*//Uncomment below 'if block' if you WANT TO ALLOW UPDATING SSO_ID in UI which is a unique key to a User.
-		if(!userService.isUserSSOUnique(user.getId(), user.getSsoId())){
-			FieldError ssoError =new FieldError("user","ssoId",messageSource.getMessage("non.unique.ssoId", new String[]{user.getSsoId()}, Locale.getDefault()));
-		    result.addError(ssoError);
-			return "registration";
-		}*/
+		
 
 
 		userService.updateUser(user);
 
 		model.addAttribute("success", "User " + user.getFirstName() + " "+ user.getLastName() + " updated successfully");
-		model.addAttribute("loggedinuser", getPrincipal());
+		model.addAttribute(LOGGED_IN_USER, getPrincipal());
 		return "registrationsuccess";
 	}
 
@@ -174,7 +172,7 @@ public class AppController {
 	 */
 	@RequestMapping(value = "/Access_Denied", method = RequestMethod.GET)
 	public String accessDeniedPage(ModelMap model) {
-		model.addAttribute("loggedinuser", getPrincipal());
+		model.addAttribute(LOGGED_IN_USER, getPrincipal());
 		return "accessDenied";
 	}
 
@@ -199,7 +197,7 @@ public class AppController {
 	public String logoutPage (HttpServletRequest request, HttpServletResponse response){
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		if (auth != null){    
-			//new SecurityContextLogoutHandler().logout(request, response, auth);
+			
 			persistentTokenBasedRememberMeServices.logout(request, response, auth);
 			SecurityContextHolder.getContext().setAuthentication(null);
 		}
@@ -210,7 +208,7 @@ public class AppController {
 	 * This method returns the principal[user-name] of logged-in user.
 	 */
 	private String getPrincipal(){
-		String userName = null;
+		String userName;
 		Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
 		if (principal instanceof UserDetails) {
